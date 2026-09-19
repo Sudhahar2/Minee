@@ -5,6 +5,7 @@ const loveConfig = {
   birthdayDate: '2026-09-20T00:00:00',
   counterMessage: 'Nalla purinjiko, enoda life la enakku kedacha oru gift na adhu nee dhaan 🎁💗. Evlovo persons life la cross panni vandhirukkaanga, aana unkooda irukkumbothu kedaikkira comfort feel vera yaar koodayum irukkumbothu varala 🤍. Enoda heart la irukkura unoda place ah life la yaaralum replace panna mudiyadhu. Nee dhaan enoda only best person uh! 🫶✨. Unna evlovo times hurt pannirukken dhana? Sorry 🥺. Ini unna hurt panna maaten. Life la endha situation layum nee enna vittu poira koodadhu 🫂💞',
   finalQuestion: 'Will you be mine?',
+  notificationTopic: 'Mybutteryeeee',
   finalMessage: `Unnoda enakku life full aa travel pannanum nu romba aasai 🛣️💗. Unakku enna pudikkum, enna pudikkaadhu nu enakku innum full aa theriyama irukkalam, aana parava illa… adhellam unnata ketu konjam konjam aa therinjukittu, un wishes um dreams um purinjuka aasai padren 🌙✨.
 
 Hey, nee enna paakura maari naan unna paakalayae… naan pesum kaadhal vasanam unakku thaan kekalayae… 😭🤌💕. Andha maari dhaan, en feelings ellam unakku puriyudha illaya nu enakku theriyadhu… aana naan feel panradhu mattum romba genuine.
@@ -237,11 +238,34 @@ Thuli kaadhal ketten 😭`;
   });
 
   const audio = $('#loveSong');
+
+  const sendYesNotification = async () => {
+    if (!loveConfig.notificationTopic) return;
+    const topic = encodeURIComponent(loveConfig.notificationTopic.trim());
+    try {
+      const response = await fetch(`https://ntfy.sh/${topic}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+          'Title': `${loveConfig.herName} said yes!`,
+          'Priority': 'urgent',
+          'Tags': 'heart'
+        },
+        body: `${loveConfig.herName} pressed YES on your birthday page.`
+      });
+      if (!response.ok) throw new Error('Notification request failed');
+      $('#choiceNote').textContent = 'The good news has reached your phone too.';
+    } catch (error) {
+      $('#choiceNote').textContent = 'The yes was saved here, but the phone notification could not be sent.';
+    }
+  };
+
   const musicButton = $('#musicToggle');
   musicButton.addEventListener('click', async () => {
     if (!loveConfig.musicUrl) {
       $('#choiceNote').textContent = 'Add your favorite song in loveConfig.musicUrl to turn the soundtrack on.';
       return;
+    sendYesNotification();
     }
     if (audio.paused) await audio.play(); else audio.pause();
     const playing = !audio.paused;
